@@ -15,4 +15,4 @@ To use, enter sudoku with `0`s as empty cells, separating numbers with spaces, e
 0 0 0 0 8 0 0 7 9
 ```
 
-In the `inputs.h` file there are some example inputs which you can use to test program.
+In the `inputs.h` file there are some example inputs which you can use to test program. If you won't change the code, there is no need to compile that file.
