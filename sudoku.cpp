@@ -24,6 +24,12 @@ Sudoku::Sudoku(int sudoku[81])
 
 void Sudoku::Solve()
 {
+	if (cost.GetTotal() == 0)
+	{
+		cout << "Sudoku already solved." << endl;
+		return;
+	}
+
 	/* Uncomment to show formatted input */
 	/*
 	cout << endl;
