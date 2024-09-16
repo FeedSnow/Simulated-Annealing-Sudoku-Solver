@@ -8,6 +8,7 @@ public:
 	void Solve();
 	void Print();
 	void PrintWithCost();
+	friend void Display(Sudoku sudoku);
 private:
 	struct Cell
 	{
