@@ -30,22 +30,7 @@ void Sudoku::Solve()
 		return;
 	}
 
-	/* Uncomment to show formatted input */
-	/*
-	cout << endl;
-	cout << "Sudoku to solve:" << endl;
-	Print();
-	cout << endl;
-	/**/
-
 	FillRandomly();
-
-	/* Uncomment to show randomized sudoku */
-	/*
-	cout << "Randomized:" << endl;
-	PrintWithCost();
-	cout << endl;
-	/**/
 
 	const double t0 = CalcT0();
 	const double alpha = 0.5;
@@ -81,7 +66,7 @@ void Sudoku::Solve()
 
 	cout << endl;
 	cout << "Solution found in " << it << " iterations:" << endl;
-	Print();
+	Display();
 }
 
 void Sudoku::Print()
@@ -124,6 +109,97 @@ void Sudoku::PrintWithCost()
 	cout << "   " << cost.GetTotal() << endl;
 }
 
+#include <SFML/Graphics.hpp>
+
+const float CELLSIZE = 50;
+const string FONTNAME = "Lato-Regular.ttf";
+
+void Sudoku::Display()
+{
+	float off1 = CELLSIZE * 0.04;
+	float off2 = CELLSIZE * 0.1 - off1;
+	int windowsize = 9 * CELLSIZE + 10 * off1 + 4 * off2;
+	sf::RenderWindow window(sf::VideoMode(windowsize, windowsize), "Solved Sudoku");
+
+	vector<sf::RectangleShape> cell_shapes;
+	float X = 0;
+	float Y = 0;
+	for (int i = 0; i < 9; i++)
+	{
+		X = 0;
+		Y += off1;
+		if (i % 3 == 0)
+			Y += off2;
+		for (int j = 0; j < 9; j++)
+		{
+			X += off1;
+			if (j % 3 == 0)
+				X += off2;
+
+			sf::RectangleShape cell(sf::Vector2f(CELLSIZE, CELLSIZE));
+			cell.setFillColor(sf::Color::White);
+			cell.setPosition(sf::Vector2f(X, Y));
+			cell_shapes.push_back(cell);
+
+			X += CELLSIZE;
+		}
+		Y += CELLSIZE;
+	}
+
+	sf::Font font;
+	if (!font.loadFromFile(FONTNAME))
+	{
+		cerr << "Couldn't load font from file." << endl;
+		return;
+	}
+
+	vector<sf::Text> numbers;
+	X = Y = CELLSIZE / 2;
+	for (int i = 0; i < 9; i++)
+	{
+		X = CELLSIZE / 2;
+		Y += off1;
+		if (i % 3 == 0)
+			Y += off2;
+		for (int j = 0; j < 9; j++)
+		{
+			X += off1;
+			if (j % 3 == 0)
+				X += off2;
+			
+			sf::Text text(to_string(Get(i, j).value), font, CELLSIZE * 0.9);
+			text.setFillColor(Get(i, j).fixed ? sf::Color(0, 128U, 0, 255U) : sf::Color::Black);
+			auto center = text.getGlobalBounds().getSize() / 2.f;
+			auto localBounds = center + text.getLocalBounds().getPosition();
+			auto rounded = sf::Vector2f(round(localBounds.x), round(localBounds.y));
+			text.setOrigin(rounded);
+			text.setPosition(sf::Vector2f(X, Y));
+			numbers.push_back(text);
+
+			X += CELLSIZE;
+		}
+		Y += CELLSIZE;
+	}
+
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.clear();
+		for (int i = 0; i < cell_shapes.size(); i++)
+		{
+			window.draw(cell_shapes[i]);
+			window.draw(numbers[i]);
+		}
+		window.display();
+	}
+}
 
 
 int Sudoku::Cost::GetTotal()
