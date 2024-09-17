@@ -5,10 +5,12 @@
 #include <Python.h>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 
 using namespace std;
+namespace fs = filesystem;
 
-bool RunPythonScript()
+bool RunPythonScript(string filename)
 {
     Py_Initialize();
 
@@ -20,10 +22,12 @@ bool RunPythonScript()
     if (pModule != NULL)
     {
         PyObject* pFunc = PyObject_GetAttrString(pModule, "read");
+        PyObject* pArg = PyUnicode_DecodeFSDefault(filename.c_str());
 
         if (pFunc && PyCallable_Check(pFunc))
         {
-            pValue = PyObject_CallObject(pFunc, NULL);
+            //pValue = PyObject_CallObject(pFunc, "test");
+            pValue = _PyObject_CallMethod(pModule, PyUnicode_DecodeFSDefault("read"), "s", filename.c_str());
 
             if (pValue == NULL || PyLong_AsLong(pValue) == 0)
             {
@@ -34,6 +38,7 @@ bool RunPythonScript()
                 return false;
             }
             Py_DECREF(pValue);
+            Py_DECREF(pArg);
         }
         else {
             if (PyErr_Occurred())
@@ -56,12 +61,24 @@ bool RunPythonScript()
 
 void Read(int sudoku[81])
 {
-    if (RunPythonScript())
+    string filename = "";
+    while (true)
+    {
+        cout << "Enter Sudoku image file name: ";
+        getline(cin, filename);
+        if (fs::exists("images/" + filename))
+            break;
+        cout << "File \"" << filename << "\" doesn't exit in images directory." << endl;
+    }
+    cout << "Loading..." << endl;
+
+    if (RunPythonScript(filename))
     {
         ifstream is("data.txt");
         if (!is)
         {
             cerr << "Failed to load data" << endl;
+            return;
             exit(1);
         }
         for (int i = 0; i < 81; i++)
@@ -71,6 +88,7 @@ void Read(int sudoku[81])
     else
     {
         cerr << "Failed to run python script" << endl;
+        return;
         exit(2);
     }
 }

@@ -13,7 +13,8 @@ Sudoku::Sudoku(int sudoku[81])
 	{
 		if (sudoku[i] < 0 || sudoku[i] > 9)
 		{
-			cout << "Invalid value!" << endl;
+			cerr << "Invalid value! " << sudoku[i] << endl;
+			return;
 			exit(1);
 		}
 

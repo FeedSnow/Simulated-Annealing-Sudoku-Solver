@@ -8,14 +8,14 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 
 
-def read():
+def read(filename):
     
     dir = os.path.dirname(os.path.realpath(__file__))
 
     model = load_model(dir+'/sudoku_model.keras')
 
     folder=dir+"/images"
-    filename = input("Enter sudoku image name: ")
+    #filename = input("Enter sudoku image name: ")
     sudoku_a = cv2.imread(folder+'/'+filename)
 
     sudoku_a = cv2.resize(sudoku_a, (450,450))
